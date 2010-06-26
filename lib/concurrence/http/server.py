@@ -46,6 +46,9 @@ class WSGIInputStream(object):
         if self._n is not None:
             self._channel.receive() #wait till handler has read all input data
 
+    def read_all(self):
+        return self.read(self._n)
+
     def read(self, n):
         if self._n > 0:
             data = self._file.read(min(self._n, n))
@@ -332,6 +335,8 @@ class HTTPHandler(object):
             elif msg.match(self.MSG_REQUEST_HANDLED):
                 #we use reque to retire (send out) the responses in the correct order
                 for request, response in self._reque.finish(request, response):
+                    # we must consume all incoming POST data
+                    request.environ["wsgi.input"].read_all()
                     self.MSG_WRITE_RESPONSE.send(response_writer)(request, response)
 
             elif msg.match(self.MSG_RESPONSE_WRITTEN):
