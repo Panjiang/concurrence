@@ -10,7 +10,7 @@ from __future__ import with_statement
 import time
 import logging
 
-from concurrence import Tasklet, Channel, Message, __version__
+from concurrence import Tasklet, Channel, Message, __version__, TimeoutError
 from concurrence.timer import Timeout
 from concurrence.io import Connector, BufferedStream
 from concurrence.http import HTTPError, HTTPRequest, HTTPResponse
@@ -41,6 +41,9 @@ class HTTPConnection(object):
 
     log = logging.getLogger('HTTPConnection')
 
+    def __init__(self):
+        self.limit = None
+
     def connect(self, endpoint):
         """Connect to the webserver at *endpoint*. *endpoint* is a tuple (<host>, <port>)."""
         self._host = None
@@ -51,6 +54,9 @@ class HTTPConnection(object):
                 pass
         self._stream = BufferedStream(Connector.connect(endpoint), read_buffer_size = 1024 * 8, write_buffer_size = 1024 * 4)
 
+    def set_limit(self, limit):
+        self.limit = limit
+
     def receive(self):
         """Receive the next :class:`HTTPResponse` from the connection."""
         try:
@@ -59,6 +65,10 @@ class HTTPConnection(object):
             raise
         except EOFError:
             raise HTTPError("EOF while reading response")
+        except HTTPError:
+            raise
+        except TimeoutError:
+            raise
         except Exception:
             self.log.exception('')
             raise HTTPError("Exception while reading response")
@@ -85,6 +95,8 @@ class HTTPConnection(object):
 
             try:
                 content_length = int(response.get_header('Content-Length'))
+                if self.limit is not None and content_length > self.limit:
+                    raise HTTPError("Response is too long")
             except:
                 content_length = None
 
@@ -109,7 +121,16 @@ class HTTPConnection(object):
                     chunks.append(data)
                     content_length -= len(data)
             else:
-                assert False, 'TODO'
+                content_length = 0
+                while True:
+                    try:
+                        data = reader.read_bytes_available()
+                    except EOFError:
+                        break
+                    chunks.append(data)
+                    content_length += len(data)
+                    if self.limit is not None and content_length > self.limit:
+                        raise HTTPError("Response is too long")
 
             response.iter = chunks
 
