@@ -22,7 +22,7 @@ if 'CONCURRENCE_LIBEVENT_PREFIX' in os.environ:
     libevent_include_dirs = ['%s/include' % prefix]
     libevent_library_dirs = ['%s/lib' % prefix]
 
-VERSION = '0.3.1' #must be same as concurrence.__init__.py.__version__
+VERSION = '0.3.2' #must be same as concurrence.__init__.py.__version__
 
 setup(
   name = "concurrence",
