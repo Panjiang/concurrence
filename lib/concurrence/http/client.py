@@ -90,47 +90,49 @@ class HTTPConnection(object):
                 key, value = line.split(': ')
                 response.add_header(key, value)
 
-            #read data
-            transfer_encoding = response.get_header('Transfer-Encoding', None)
-
-            try:
-                content_length = int(response.get_header('Content-Length'))
-                if self.limit is not None and content_length > self.limit:
-                    raise HTTPError("Response is too long")
-            except:
-                content_length = None
-
-            #TODO better support large data, e.g. iterator instead of append all data to chunks
             chunks = []
 
-            if transfer_encoding == 'chunked':
-                while True:
-                    chunk_line = reader.read_line()
-                    chunk_size = int(chunk_line.split(';')[0], 16)
-                    if chunk_size > 0:
-                        data = reader.read_bytes(chunk_size)
-                        reader.read_line() #chunk is always followed by a single empty line
-                        chunks.append(data)
-                    else:
-                        reader.read_line() #chunk is always followed by a single empty line
-                        break
-            elif content_length is not None:
-                while content_length > 0:
-                    n = min(CHUNK_SIZE, content_length)
-                    data = reader.read_bytes(n)
-                    chunks.append(data)
-                    content_length -= len(data)
-            else:
-                content_length = 0
-                while True:
-                    try:
-                        data = reader.read_bytes_available()
-                    except EOFError:
-                        break
-                    chunks.append(data)
-                    content_length += len(data)
+            if response.status_code != 204:
+                #read data
+                transfer_encoding = response.get_header('Transfer-Encoding', None)
+
+                try:
+                    content_length = int(response.get_header('Content-Length'))
                     if self.limit is not None and content_length > self.limit:
                         raise HTTPError("Response is too long")
+                except:
+                    content_length = None
+
+                #TODO better support large data, e.g. iterator instead of append all data to chunks
+
+                if transfer_encoding == 'chunked':
+                    while True:
+                        chunk_line = reader.read_line()
+                        chunk_size = int(chunk_line.split(';')[0], 16)
+                        if chunk_size > 0:
+                            data = reader.read_bytes(chunk_size)
+                            reader.read_line() #chunk is always followed by a single empty line
+                            chunks.append(data)
+                        else:
+                            reader.read_line() #chunk is always followed by a single empty line
+                            break
+                elif content_length is not None:
+                    while content_length > 0:
+                        n = min(CHUNK_SIZE, content_length)
+                        data = reader.read_bytes(n)
+                        chunks.append(data)
+                        content_length -= len(data)
+                else:
+                    content_length = 0
+                    while True:
+                        try:
+                            data = reader.read_bytes_available()
+                        except EOFError:
+                            break
+                        chunks.append(data)
+                        content_length += len(data)
+                        if self.limit is not None and content_length > self.limit:
+                            raise HTTPError("Response is too long")
 
             response.iter = chunks
 
