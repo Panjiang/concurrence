@@ -9,3 +9,5 @@ tmp
 *.egg
 lib/concurrence/http/concurrence.http._http.c
 lib/concurrence/concurrence._event14.c
+concurrence.egg-info
+debian/concurrence

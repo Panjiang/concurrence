@@ -1,3 +1,5 @@
+export PYTHONPATH=/usr/share/pyshared:$(DESTDIR)/usr/lib/$(PYTHON)
+
 build:
 	$(PYTHON) setup.py build
 
@@ -8,7 +10,9 @@ egg:
 	$(PYTHON) setup.py bdist_egg
 				
 install:
-	$(PYTHON) setup.py install
+	mkdir -p $(DESTDIR)/usr/lib/$(PYTHON)
+	$(PYTHON) setup.py install --prefix=$(DESTDIR)/usr --install-purelib=$(DESTDIR)/usr/lib/$(PYTHON) --install-platlib=$(DESTDIR)/usr/lib/$(PYTHON) --install-layout=deb --root=/
+	ls -lR $(DESTDIR)/usr
 
 sdist:
 	$(PYTHON) setup.py sdist
@@ -39,7 +43,7 @@ dist_clean: clean
 	find . -name .svn -exec rm -rf {} \;
 
 _test: 
-	cd test; make test
+	#cd test; make test
 
 test: _test 
 
