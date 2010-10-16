@@ -1,0 +1,65 @@
+concurrence (0.3.2-6) unstable; urgency=low
+
+  * Size and time limits on HTTP client downloads
+
+ -- Alexander Lourier <aml@rulezz.ru>  Thu, 09 Sep 2010 16:14:35 +0400
+
+concurrence (0.3.2-5) unstable; urgency=low
+
+  * Fixed bug with readline buffer size
+
+ -- Alexander Lourier <aml@rulezz.ru>  Thu, 09 Sep 2010 14:51:32 +0400
+
+concurrence (0.3.2-4) unstable; urgency=low
+
+  * libevent dependency
+
+ -- Alexander Lourier <aml@rulezz.ru>  Fri, 06 Aug 2010 13:54:01 +0400
+
+concurrence (0.3.2-2) unstable; urgency=low
+
+  * WSGIInputStream.readline implemented
+
+ -- Alexander Lourier <aml@rulezz.ru>  Wed, 04 Aug 2010 17:24:40 +0400
+
+concurrence (0.3.2-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Alexander Lourier <aml@rulezz.ru>  Fri, 04 Jun 2010 19:46:52 +0400
+
+concurrence (0.3.1-6) unstable; urgency=low
+
+  * python-webob added to dependencies
+
+ -- Alexander Lourier <aml@rulezz.ru>  Tue, 01 Jun 2010 18:08:50 +0400
+
+concurrence (0.3.1-5) unstable; urgency=low
+
+  * python-routes added to dependencies
+
+ -- Alexander Lourier <aml@rulezz.ru>  Tue, 01 Jun 2010 17:57:25 +0400
+
+concurrence (0.3.1-4) unstable; urgency=low
+
+  * Library paths fixed
+
+ -- Alexander Lourier <aml@rulezz.ru>  Tue, 01 Jun 2010 16:01:15 +0400
+
+concurrence (0.3.1-3) unstable; urgency=low
+
+  * Disabled pysupport
+
+ -- Alexander Lourier <aml@rulezz.ru>  Tue, 01 Jun 2010 13:10:17 +0400
+
+concurrence (0.3.1-2) unstable; urgency=low
+
+  * fixed install dir
+
+ -- Alexander Lourier <aml@rulezz.ru>  Sat, 27 Mar 2010 21:15:46 +0300
+
+concurrence (0.3.1-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Alexander Lourier <aml@rulezz.ru>  Sat, 27 Mar 2010 19:24:28 +0300
