@@ -12,6 +12,7 @@ import urlparse
 import httplib
 import traceback
 import rfc822
+import re
 
 from concurrence import Tasklet, Message, Channel, TimeoutError, __version__
 from concurrence.io import Server, BufferedStream
@@ -41,13 +42,11 @@ class WSGIInputStream(object):
             self._n = int(content_length)
             self._file = reader.file()
             self._channel = Channel()
+        self.readline_buffer = None
 
     def _read_request_data(self):
         if self._n is not None:
             self._channel.receive() #wait till handler has read all input data
-
-    def read_all(self):
-        return self.read(self._n)
 
     def read(self, n):
         if self._n > 0:
@@ -63,7 +62,23 @@ class WSGIInputStream(object):
             return '' #EOF
 
     def readline(self):
-        assert False, 'TODO'
+        if self.readline_buffer is None:
+            self.readline_buffer = ''
+            self.re_line = re.compile(r'^(.*?(?:\r\n|\n))(.*)', re.DOTALL)
+        while True:
+            m = self.re_line.match(self.readline_buffer)
+            if m:
+                line, self.readline_buffer = m.group(1, 2)
+                return line
+            elif self._n <= 0:
+                if len(self.readline_buffer):
+                    line = self.readline_buffer
+                    self.readline_buffer = ''
+                    return line
+                return None
+            data = self._file.read(min(self._n, 16384))
+            self._n -= len(data)
+            self.readline_buffer = self.readline_buffer + data
 
     def readlines(self):
         assert False, 'TODO'
@@ -333,10 +348,9 @@ class HTTPHandler(object):
                 Tasklet.new(self.handle_request, name = 'request_handler')(control, request, application)
 
             elif msg.match(self.MSG_REQUEST_HANDLED):
+                #request.environ["wsgi.input"].read(request.environ["wsgi.input"]._n)
                 #we use reque to retire (send out) the responses in the correct order
                 for request, response in self._reque.finish(request, response):
-                    # we must consume all incoming POST data
-                    request.environ["wsgi.input"].read_all()
                     self.MSG_WRITE_RESPONSE.send(response_writer)(request, response)
 
             elif msg.match(self.MSG_RESPONSE_WRITTEN):

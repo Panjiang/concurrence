@@ -200,19 +200,6 @@ class TestHTTP(unittest.TestCase):
         finally:
             cnn.close()        
 
-    def testHTTPUnexpectedPost(self):
-        cnn = HTTPConnection()
-
-        try:
-            cnn.connect(('localhost', SERVER_PORT))
-            for i in [1, 2, 4]:
-                post_data = 'test post data'
-                request = cnn.post('/sleep?%s' % i, post_data, host = 'testhost.nl')
-                response = cnn.perform(request)
-                self.assertEquals('slept %s' % i, response.body)
-        finally:
-            cnn.close()        
-
 if __name__ == '__main__':
     unittest.main(timeout = 100.0)
 
