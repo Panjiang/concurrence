@@ -106,7 +106,7 @@ cdef class HTTPParser:
     cdef _cb_field(self, name, value):
         key = 'HTTP_' + name
         if key in self.environ:
-            self.environ[key] += ',' + value # comma-separate multiple headers
+            self.environ[key] = self.environ[key] + ',' + value # comma-separate multiple headers
         else:
             self.environ[key] = value
 
@@ -123,7 +123,7 @@ cdef class HTTPParser:
             if http_parser_has_error(self._parser):
                 raise HTTPParserError("parse error")
             else:
-                self._buffer._position += self._buffer._position + nread
+                self._buffer._position = self._buffer._position + nread
                 if http_parser_is_finished(self._parser):
                     return True
                 else:

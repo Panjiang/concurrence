@@ -6,3 +6,6 @@ build
 tmp
 *.dep
 .settings
+*.egg
+lib/concurrence/http/concurrence.http._http.c
+lib/concurrence/concurrence._event14.c

@@ -223,14 +223,14 @@ cdef class PacketReader:
             #64 bit word
             if packet._position + 9 > packet._limit: raise  BufferUnderflowError()
             vw = 0
-            vw |= (<unsigned long long>packet._buff[packet._position + 1]) << 0
-            vw |= (<unsigned long long>packet._buff[packet._position + 2]) << 8
-            vw |= (<unsigned long long>packet._buff[packet._position + 3]) << 16
-            vw |= (<unsigned long long>packet._buff[packet._position + 4]) << 24 
-            vw |= (<unsigned long long>packet._buff[packet._position + 5]) << 32
-            vw |= (<unsigned long long>packet._buff[packet._position + 6]) << 40
-            vw |= (<unsigned long long>packet._buff[packet._position + 7]) << 48
-            vw |= (<unsigned long long>packet._buff[packet._position + 8]) << 56
+            vw = vw | (<unsigned long long>packet._buff[packet._position + 1]) << 0
+            vw = vw | (<unsigned long long>packet._buff[packet._position + 2]) << 8
+            vw = vw | (<unsigned long long>packet._buff[packet._position + 3]) << 16
+            vw = vw | (<unsigned long long>packet._buff[packet._position + 4]) << 24 
+            vw = vw | (<unsigned long long>packet._buff[packet._position + 5]) << 32
+            vw = vw | (<unsigned long long>packet._buff[packet._position + 6]) << 40
+            vw = vw | (<unsigned long long>packet._buff[packet._position + 7]) << 48
+            vw = vw | (<unsigned long long>packet._buff[packet._position + 8]) << 56
             packet._position = packet._position + 9
             return vw
 

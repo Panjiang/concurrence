@@ -421,7 +421,7 @@ cdef class Buffer:
                 s2.append(c)
             else:
                 s2.append('.')
-            x += 1
+            x = x + 1
             if x % 16 == 0:
                 out.write('%04x' % (x - 16) + '  ' + ' '.join(s1[:8]) + '  ' + ' '.join(s1[8:]) + '  ' + ''.join(s2[:8]) + ' ' + (''.join(s2[8:]) + '\n'))
                 s1 = []
