@@ -156,8 +156,10 @@ class WSGIRequest(object):
         if chunked:
             writer.write_bytes("Transfer-Encoding: chunked\r\n")
         else:
-            response = ''.join(response)
-            writer.write_bytes("Content-length: %d\r\n" % len(response))
+            l = 0
+            for chunk in response:
+                l += len(chunk)
+            writer.write_bytes("Content-length: %d\r\n" % l)
 
         writer.write_bytes("\r\n")
 
@@ -171,7 +173,8 @@ class WSGIRequest(object):
 
             writer.write_bytes("0\r\n\r\n")
         else:
-            writer.write_bytes(response)
+            for chunk in response:
+                writer.write_bytes(chunk if type(chunk) == str else str(chunk))
 
         writer.flush() #TODO use special header to indicate no flush needed
 
