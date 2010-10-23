@@ -1,3 +1,15 @@
+concurrence (0.3.2-9) unstable; urgency=low
+
+  * Deferred evaluation of chunks
+
+ -- Alexander Lourier <aml@rulezz.ru>  Sun, 24 Oct 2010 01:56:14 +0400
+
+concurrence (0.3.2-8) unstable; urgency=low
+
+  * Minor changes
+
+ -- Alexander Lourier <aml@rulezz.ru>  Sat, 23 Oct 2010 01:34:17 +0400
+
 concurrence (0.3.2-6) unstable; urgency=low
 
   * Size and time limits on HTTP client downloads
