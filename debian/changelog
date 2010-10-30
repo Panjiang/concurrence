@@ -1,3 +1,9 @@
+concurrence (0.3.2-10) unstable; urgency=low
+
+  * Thrift and SMTP implementation
+
+ -- Alexander Lourier <aml@rulezz.ru>  Sat, 30 Oct 2010 10:38:57 +0400
+
 concurrence (0.3.2-9) unstable; urgency=low
 
   * Deferred evaluation of chunks
