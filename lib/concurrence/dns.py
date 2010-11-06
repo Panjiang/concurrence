@@ -21,17 +21,18 @@ class QueryEngine(object):
         self._s = s
         self._queries = {}
         self._command_channel = stackless.channel()
+        self._running = False
 
     def synchronous(self, qname, rr, flags=0):
         return self._s.synchronous(qname, rr, flags)
 
     def asynchronous(self, qname, rr, flags=0):
+        if not self._running:
+            self._running = True
+            stackless.tasklet(self._run)()
         response_channel = stackless.channel()
         self._command_channel.send((qname, rr, flags, response_channel))
         return response_channel.receive()
-
-    def run(self):
-        stackless.tasklet(self._run)()
 
     def _run(self):
         while True:
