@@ -35,15 +35,22 @@ class QueryEngine(object):
         return response_channel.receive()
 
     def _run(self):
+        first = True
         while True:
-            # if no pending queries, blocking on channel
-            while not len(self._queries) or self._command_channel.balance > 0:
+            # stop if no pending queries and this not the first request
+            if not len(self._queries) and not first:
+                break
+            # accept new queries
+            while self._command_channel.balance > 0:
+                first = False
                 qname, rr, flags, response_channel = self._command_channel.receive()
                 q = self._s.submit(qname, rr, flags)
                 self._queries[q] = response_channel
+            # check completeness
             for q in self._s.completed(0):
                 answer = q.check()
                 response_channel = self._queries[q]
                 del self._queries[q]
                 response_channel.send(answer)
             stackless.schedule()
+        self._running = False
