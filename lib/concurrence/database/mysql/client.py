@@ -291,6 +291,9 @@ class Connection(object):
             else: #result set
                 self.current_resultset = ResultSet(self, result)
                 return self.current_resultset
+        except:
+            self.state = self.STATE_ERROR
+            raise
         finally:
             self._incommand = False
 
