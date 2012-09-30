@@ -77,9 +77,7 @@ class TaskletPool(object):
             try:
                 f, args, kwargs = self._queue.popleft(True, TIMEOUT_NEVER)
                 f(*args, **kwargs)
-            except TaskletExit:
-                raise
-            except:
+            except Exception:
                 self.log.exception("in taskpool worker")
                 Tasklet.sleep(1.0)
 
@@ -102,9 +100,7 @@ class DeferredQueue(object):
                 try:
                     f, args, kwargs = self._queue.popleft()
                     f(*args, **kwargs)
-                except TaskletExit:
-                    raise
-                except:
+                except Exception:
                     self.log.exception("in deferred queue")
         finally:
             self._working = False

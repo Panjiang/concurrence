@@ -50,7 +50,7 @@ class HTTPConnection(object):
         if type(endpoint) == type(()):
             try:
                 self._host = endpoint[0]
-            except:
+            except Exception:
                 pass
         self._stream = BufferedStream(Connector.connect(endpoint), read_buffer_size = 1024 * 8, write_buffer_size = 1024 * 4)
 
@@ -100,7 +100,7 @@ class HTTPConnection(object):
                     content_length = int(response.get_header('Content-Length'))
                     if self.limit is not None and content_length > self.limit:
                         raise HTTPError("Response is too long")
-                except:
+                except Exception:
                     content_length = None
 
                 #TODO better support large data, e.g. iterator instead of append all data to chunks

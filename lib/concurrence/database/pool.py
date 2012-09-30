@@ -160,11 +160,9 @@ class Pool(BasePool):
                 #none available, but still allowed to create new connection
                 try:
                     return (True, self._new())
-                except TaskletExit:
-                    raise #server exiting
                 except TimeoutError:
                     raise
-                except:
+                except Exception:
                     self.log.exception("%s: could not create new connection for pool", self)
                     #we will continue from here waiting for idle connection
 

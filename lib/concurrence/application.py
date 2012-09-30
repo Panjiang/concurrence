@@ -66,7 +66,7 @@ class Container(object):
         for _, resource, fa, member in self._find_members(r'__start(\d\d)__'):
             try:
                 level = int(fa[0])
-            except:
+            except Exception:
                 level = -1
                 
             if level != -1:

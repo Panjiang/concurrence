@@ -16,10 +16,10 @@ import concurrence._unittest as unittest
 
 try:
     import json
-except:
+except Exception:
     try:
         import simplejson as json
-    except:
+    except Exception:
         import logging
         logging.exception("could not import json library!', pls install simplejson or use python 2.6+")
 

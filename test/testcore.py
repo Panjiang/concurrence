@@ -172,7 +172,7 @@ class TestTasklet(unittest.TestCase):
         except TimeoutError:
             #expect 2 counts, because interval started after 1 second
             self.assertEquals(2, len(count))
-        except:
+        except Exception:
             self.fail('expected timeout, got %s' % sys.exc_type)
         finally:
             ival_task.kill()
@@ -186,7 +186,7 @@ class TestTasklet(unittest.TestCase):
         except TimeoutError:
             #expect 3 counts, because interval started immediately
             self.assertEquals(3, len(count))
-        except:
+        except Exception:
             self.fail('expected timeout')
         finally:
             ival_task.kill()

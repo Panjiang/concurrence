@@ -185,9 +185,7 @@ class WSGIRequest(object):
             return self._server.not_implemented(self.environ, self.start_response)
         try:
             return application(self.environ, self.start_response)
-        except TaskletExit:
-            raise
-        except:
+        except Exception:
             self.log.exception("unhandled exception while handling request")
             return self._server.internal_server_error(self.environ, self.start_response)
 

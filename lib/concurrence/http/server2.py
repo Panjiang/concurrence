@@ -200,9 +200,7 @@ class WSGIServer(object):
         try:
             response = self._application(request.environ, request.start_response)
             self.log.log(self._request_log_level, "%s %s", request.response_status, request.uri)        
-        except TaskletExit:
-            raise
-        except:
+        except Exception:
             self.log.exception("unhandled exception while handling request")
             response = self.internal_server_error(request.environ, request.start_response)
         return response

@@ -413,9 +413,7 @@ class Tasklet(stackless.tasklet):
                     results[t] = cls.join(t, deadline - time.time())
             except JoinError, je:
                 results[je.tasklet] = je
-            except TaskletExit:
-                raise
-            except:
+            except Exception:
                 assert False, "expecting only join errors here"
 
         return [results[t] for t in tasks]
@@ -436,9 +434,7 @@ class Tasklet(stackless.tasklet):
             while True:
                 try:
                     f(*args, **kwargs)
-                except TaskletExit:
-                    break
-                except:
+                except Exception:
                     logging.exception("unhandled exception in Tasklet.loop")
                     cls.sleep(1.0) #prevent hogging the cpu if exception repeats
 
@@ -458,9 +454,7 @@ class Tasklet(stackless.tasklet):
                 cls.sleep(timeout)
                 try:
                     f(*args, **kwargs)
-                except TaskletExit:
-                    break
-                except:
+                except Exception:
                     logging.exception("unhandled exception in Tasklet.interval")
         return cls.new(_interval, **kwargs)
 
@@ -492,9 +486,7 @@ class Tasklet(stackless.tasklet):
                     if timeout < min_timeout: timeout = min_timeout
                 try:
                     f(current_time, *args, **kwargs)
-                except TaskletExit:
-                    break
-                except:
+                except Exception:
                     logging.exception("unhandled exception in Tasklet.rate")
         return cls.new(_interval, **kwargs)
 
@@ -507,9 +499,7 @@ class Tasklet(stackless.tasklet):
             for msg, args, kwargs in cls.receive():
                 try:
                     f(msg, *args, **kwargs)
-                except TaskletExit:
-                    break
-                except:
+                except Exception:
                     logging.exception("unhandled exception in Tasklet.receiver")
         return cls.new(_receiver, **kwargs)
 
@@ -806,9 +796,7 @@ def _dispatch(f = None):
             try:
                 while stackless.getruncount() > 1:
                     stackless.schedule()
-            except TaskletExit:
-                pass
-            except:
+            except Exception:
                 logging.exception("unhandled exception in dispatch schedule")
 
             #now block on IO till any IO is ready.
@@ -818,9 +806,7 @@ def _dispatch(f = None):
             #so we call 'loop' which blocks until something available.
             try:
                 event.loop()
-            except TaskletExit:
-                raise
-            except:
+            except Exception:
                 logging.exception("unhandled exception in event loop")
 
             #we iterate over the available triggered events and
@@ -831,9 +817,7 @@ def _dispatch(f = None):
                 try:
                     e, event_type, fd = event.next()
                     e.data(event_type)
-                except TaskletExit:
-                    raise
-                except:
+                except Exception:
                     logging.exception("unhandled exception in event callback")
 
     finally:

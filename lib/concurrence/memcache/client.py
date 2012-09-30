@@ -144,9 +144,7 @@ class MemcacheConnection(object):
                     try:
                         result = protocol.read(cmd, reader)
                         result_channel.send(result)
-                    except TaskletExit:
-                        raise
-                    except:
+                    except Exception:
                         self.log.exception("read error in defer_commands")
                         result_channel.send((MemcacheResult.ERROR, error_value))
         #end _read_commands
@@ -155,9 +153,7 @@ class MemcacheConnection(object):
             try:
                 if not self.is_connected():
                     self.connect()
-            except TaskletExit:
-                raise
-            except:
+            except Exception:
                 self.log.exception("connect error in defer_commands")
                 for _, _, error_value in cmds:
                     result_channel.send((MemcacheResult.ERROR, error_value))
@@ -166,9 +162,7 @@ class MemcacheConnection(object):
                 for cmd, args, error_value in cmds:
                     try:
                         protocol.write(cmd, writer, args)
-                    except TaskletExit:
-                        raise
-                    except:
+                    except Exception:
                         self.log.exception("write error in defer_commands")
                         result_channel.send((MemcacheResult.ERROR, error_value))
                 try:

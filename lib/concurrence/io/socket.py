@@ -45,7 +45,7 @@ class Socket(IOStream):
             #sending
             try:
                 self.socket.setsockopt(_socket.IPPROTO_TCP, _socket.TCP_NODELAY, 1)
-            except:
+            except Exception:
                 self.log.warn("could not set TCP_NODELAY")
 
         #concurrence sockets are always non-blocking, this is the whole idea :-) :
@@ -168,7 +168,7 @@ class Socket(IOStream):
         try:
             err = self.socket.connect_ex(addr)
             serr = self.socket.getsockopt(_socket.SOL_SOCKET, _socket.SO_ERROR)
-        except:
+        except Exception:
             self.log.exception("unexpected exception thrown by connect_ex")
             raise
         if err == 0 and serr == 0:
@@ -180,7 +180,7 @@ class Socket(IOStream):
             try:
                 self.writable.wait(timeout = timeout)
                 self.state = self.STATE_CONNECTED
-            except:
+            except Exception:
                 self.state = self.STATE_INIT
                 raise
         else:
@@ -299,17 +299,13 @@ class SocketServer(object):
         result = None
         try:
             result = self._handler(accepted_socket)
-        except TaskletExit:
-            raise
-        except:
+        except Exception:
             self.log.exception("unhandled exception in socket handler")
         finally:
             if result is None and not accepted_socket.is_closed():
                 try:
                     accepted_socket.close()
-                except TaskletExit:
-                    raise
-                except:
+                except Exception:
                     self.log.exception("unhandled exception while forcefully closing client")
 
     def _create_socket(self):

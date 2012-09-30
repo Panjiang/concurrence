@@ -204,7 +204,7 @@ class Connection(object):
                 self.current_resultset.close(True)
             self.socket.close()
             self.state = self.STATE_CLOSED
-        except:
+        except Exception:
             self.state = self.STATE_ERROR
             raise
 
@@ -251,7 +251,7 @@ class Connection(object):
         except ClientLoginError:
             self.state = self.STATE_INIT
             raise
-        except:
+        except Exception:
             self.state = self.STATE_ERROR
             raise
 
