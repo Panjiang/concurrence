@@ -1,3 +1,9 @@
+concurrence (0.3.2-20) unstable; urgency=low
+
+  * Memcached: survive after connection loss
+
+ -- Alexander Lourier <aml@rulezz.ru>  Mon, 01 Oct 2012 01:17:03 +0400
+
 concurrence (0.3.2-19) unstable; urgency=low
 
   * Memcached: handle exceptions during flush
