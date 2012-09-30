@@ -26,7 +26,6 @@ CHUNK_SIZE = 1024 * 4
 
 HTTP_READ_TIMEOUT = 300 #default read timeout, if no request was read within this time, the connection is closed by server
 
-
 class WSGIInputStream(object):
     def __init__(self, request, reader):
         transfer_encoding = request.get_request_header('Transfer-Encoding')
@@ -61,7 +60,7 @@ class WSGIInputStream(object):
         else:
             return '' #EOF
 
-    def readline(self):
+    def readline(self, maxlen=-1):
         if self.readline_buffer is None:
             self.readline_buffer = ''
             self.re_line = re.compile(r'^(.*?(?:\r\n|\n))(.*)', re.DOTALL)
@@ -153,7 +152,7 @@ class WSGIRequest(object):
         writer.write_bytes("Date: %s\r\n" % rfc822.formatdate())
         writer.write_bytes("Server: %s\r\n" % SERVER_ID)
 
-        if chunked:
+        if chunked and self.method != 'HEAD':
             writer.write_bytes("Transfer-Encoding: chunked\r\n")
         else:
             l = 0
@@ -163,24 +162,27 @@ class WSGIRequest(object):
 
         writer.write_bytes("\r\n")
 
-        self.state = self.STATE_WRITING_DATA
+        if self.method != 'HEAD':
+            self.state = self.STATE_WRITING_DATA
 
-        if chunked:
-            for chunk in response:
-                writer.write_bytes("%x;\r\n" % len(chunk))
-                writer.write_bytes(chunk)
-                writer.write_bytes("\r\n")
+            if chunked:
+                for chunk in response:
+                    writer.write_bytes("%x;\r\n" % len(chunk))
+                    writer.write_bytes(chunk)
+                    writer.write_bytes("\r\n")
 
-            writer.write_bytes("0\r\n\r\n")
-        else:
-            for chunk in response:
-                writer.write_bytes(chunk if type(chunk) == str else str(chunk))
+                writer.write_bytes("0\r\n\r\n")
+            else:
+                for chunk in response:
+                    writer.write_bytes(chunk if type(chunk) == str else str(chunk))
 
         writer.flush() #TODO use special header to indicate no flush needed
 
         self.state = self.STATE_FINISHED
 
     def handle_request(self, application):
+        if self.method not in ['GET', 'POST', 'HEAD']:
+            return self._server.not_implemented(self.environ, self.start_response)
         try:
             return application(self.environ, self.start_response)
         except TaskletExit:
@@ -211,9 +213,6 @@ class WSGIRequest(object):
         u = urlparse.urlparse(line[1])
 
         self.method = line[0]
-        if self.method not in ['GET', 'POST']:
-            raise HTTPError('Unsupported method: %s' % self.method)
-
         #TODO validate version
         self.version = line[2]
         self.uri = line[1]
@@ -407,6 +406,10 @@ class WSGIServer(object):
         Can be overridden to provide a custom response."""
         start_response('500 Internal Server Error', [('Content-type', 'text/plain')])
         return [traceback.format_exc(20)]
+
+    def not_implemented(self, environ, start_response):
+        start_response('501 Not Implemented', [('Content-type', 'text/html')])
+        return ["<html><body>501 Not Implemented</body></html>"]
 
     def handle_request(self, request, application):
         """All HTTP requests pass trough this method.
