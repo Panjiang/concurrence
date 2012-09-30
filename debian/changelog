@@ -1,3 +1,40 @@
+concurrence (0.3.2-18) unstable; urgency=low
+
+  * MySQL RLE encoding support for 253 code
+
+ -- Alexander Lourier <aml@rulezz.ru>  Thu, 22 Mar 2012 12:03:09 +0400
+
+concurrence (0.3.2-17) unstable; urgency=low
+
+  * Error handling in Memcached module
+
+ -- Alexander Lourier <aml@rulezz.ru>  Wed, 14 Dec 2011 10:08:29 +0400
+
+concurrence (0.3.2-16) unstable; urgency=low
+
+  * HEAD method support
+  * 502 Not Implemented response to any not known method
+
+ -- Alexander Lourier <aml@rulezz.ru>  Mon, 05 Sep 2011 14:33:20 +0400
+
+concurrence (0.3.2-15) unstable; urgency=low
+
+  * WSGIInputStream.readline() now accepts parameter maxlen=-1 (does nothing although)
+
+ -- Alexander Lourier <aml@rulezz.ru>  Mon, 15 Aug 2011 13:59:17 +0400
+
+concurrence (0.3.2-14) unstable; urgency=low
+
+  * readline() now accepts parameter maxlen=-1 (does nothing although)
+
+ -- Alexander Lourier <aml@rulezz.ru>  Mon, 15 Aug 2011 13:55:53 +0400
+
+concurrence (0.3.2-13) unstable; urgency=low
+
+  * Moving to squeeze
+
+ -- Alexander Lourier <aml@rulezz.ru>  Sun, 13 Feb 2011 22:19:34 +0300
+
 concurrence (0.3.2-12) unstable; urgency=low
 
   * Bugfix with ADNS

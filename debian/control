@@ -2,13 +2,13 @@ Source: concurrence
 Section: python
 Priority: optional
 Maintainer: Alexander Lourier <aml@rulezz.ru>
-Build-Depends: debhelper (>= 7), python2.6stackless-minimal, libevent-dev (>= 1.4), python-pyrex, python2.6stackless-dev
+Build-Depends: debhelper (>= 7), python2.6-minimal (>= 2.6.stackless-1), libevent-dev (>= 1.4), python-pyrex, python2.6-dev (>= 2.6.stackless-1)
 Standards-Version: 3.8.3
 Homepage: http://opensource.hyves.org/concurrence/
 
 Package: concurrence
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, python2.6stackless-minimal, libevent-1.4-2, ${python:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, python2.6-minimal (>= 2.6.stackless-1), libevent-1.4-2, ${python:Depends}
 Recommends: python-routes, python-webob
 Description: Framework for creating massively concurrent network applications in Python.
  It takes a Lightweight-tasks-with-message-passing approach to concurrency.
