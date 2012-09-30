@@ -1,4 +1,13 @@
+CWD=$(shell pwd)
+ifndef PYTHON
+    export PYTHON=python2.6
+endif
+ifndef DESTDIR
+    export DESTDIR=$(CWD)/debian/tmp
+endif
 export PYTHONPATH=/usr/share/pyshared:$(DESTDIR)/usr/lib/$(PYTHON)
+
+.PHONY: test install doc
 
 build:
 	$(PYTHON) setup.py build
@@ -9,21 +18,18 @@ ext:
 egg:
 	$(PYTHON) setup.py bdist_egg
 				
-install:
+install: build
 	mkdir -p $(DESTDIR)/usr/lib/$(PYTHON)
 	$(PYTHON) setup.py install --prefix=$(DESTDIR)/usr --install-purelib=$(DESTDIR)/usr/lib/$(PYTHON) --install-platlib=$(DESTDIR)/usr/lib/$(PYTHON) --install-layout=deb --root=/
-	ls -lR $(DESTDIR)/usr
 
 sdist:
 	$(PYTHON) setup.py sdist
 
-_doc:
+doc:
 	rm -rf doc/html
 	cd doc/src; make html
 	cp -a doc/src/_build/html doc/html
  
-doc: _doc
-
 clean:
 	-find . -name *.pyc -exec rm -rf {} \;
 	-find . -name *.so -exec rm -rf {} \;
@@ -42,10 +48,14 @@ clean:
 dist_clean: clean
 	find . -name .svn -exec rm -rf {} \;
 
-_test: 
-	cd test; PYTHON=python2.6 make test
+test: install
+	cd test; make test
 
-test: _test 
+test-test: install
+	$(PYTHON) test/testtest.py
+
+test-core: install
+	$(PYTHON) test/testcore.py
 
 coverage:
 	cd test; coverage erase
