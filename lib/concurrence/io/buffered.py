@@ -272,7 +272,7 @@ class CompatibleFile(object):
                     buffer.flip()
                     yield buffer.read_bytes(-1)
 
-    def readline(self):
+    def readline(self, n = -1):
         return self.readlines().next()
 
     def read(self, n = -1):
