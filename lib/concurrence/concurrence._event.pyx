@@ -137,6 +137,26 @@ cdef class __event:
     def delete(self):
         if event_del(&self.ev) == -1:
             raise EventError("could not delete event")
+        # Remove the trigger from list of already triggered (but not processed) events
+        global head
+        global tail
+        cdef __list* cur
+        cdef __list* prev
+        cur = head
+        prev = NULL
+        while cur != NULL:
+            if cur == &self.trig:
+                if cur == tail:
+                    # Delete last node
+                    tail = prev
+                if cur == head:
+                    # Delete first node
+                    head = head.next
+                else:
+                    # Delete not first node
+                    prev.next = cur.next
+            prev = cur
+            cur = cur.next
 
     def __dealloc__(self):
         self.delete()
