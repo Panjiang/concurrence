@@ -1,3 +1,15 @@
+concurrence (0.3.2-19) unstable; urgency=low
+
+  * Memcached: handle exceptions during flush
+  * HEAD support for HTTP Server
+  * CompatibileFile fixes
+  * BufferedReader: corner case bugfixes
+  * Test environment enhancements
+  * Major race condition in concurrence core fixed
+  * BaseExceptions are not handled anymore
+
+ -- Alexander Lourier <aml@rulezz.ru>  Sun, 30 Sep 2012 19:34:19 +0400
+
 concurrence (0.3.2-18) unstable; urgency=low
 
   * MySQL RLE encoding support for 253 code
