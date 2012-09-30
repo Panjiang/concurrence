@@ -56,14 +56,14 @@ class TestSocket(object):
 
 
 class TestCase(unittest.TestCase):
-    def setUp(self):
-        logging.debug("setUp %s, %s", self, '; '.join(['%s: %s' % (k, v) for k, v in get_version_info().items()]))
+    #def setUp(self):
+    #    logging.debug("setUp %s, %s", self, '; '.join(['%s: %s' % (k, v) for k, v in get_version_info().items()]))
 
     def tearDown(self):
         try:
             Tasklet.yield_() #this make sure that everything gets a change to exit before we start the next test
-            logging.debug("tearDown %s, tasklet count #%d", self, Tasklet.count())
-        except:
+            #logging.debug("tearDown %s, tasklet count #%d", self, Tasklet.count())
+        except Exception:
             pass
 
 class _Timer:
@@ -83,13 +83,15 @@ class _Timer:
 def timer():
     return _Timer()
 
-def main(timeout = None):
+def main(timeout = None, ontimeout = None):
 
     logging.basicConfig()
     logging.root.setLevel(logging.DEBUG)
 
     if timeout is not None:
         def quit_test():
+            if ontimeout:
+                ontimeout()
             logging.error("quiting unittest on timeout")
             quit(EXIT_CODE_TIMEOUT)
         logging.debug("test will timeout in %s seconds", timeout)
