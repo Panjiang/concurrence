@@ -76,7 +76,8 @@ class BufferedReader(object):
         while n > 0:
             r = buffer.remaining
             if r > 0:
-                s.append(buffer.read_bytes(min(n, r)))
+                r = min(n, r)
+                s.append(buffer.read_bytes(r))
                 n -= r
             else:
                 self.fill()
@@ -291,7 +292,8 @@ class CompatibleFile(object):
             while n > 0: #read uptill n avaiable bytes or EOF
                 r = buffer.remaining
                 if r > 0:
-                    s.append(buffer.read_bytes(min(n, r)))
+                    r = min(n, r)
+                    s.append(buffer.read_bytes(r))
                     n -= r
                 else:
                     try:
