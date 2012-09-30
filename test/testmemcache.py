@@ -31,7 +31,7 @@ class TestMemcache(unittest.TestCase):
         self.log.debug("using memcached daemon: %s", MEMCACHED_BIN)
 
         for i in range(4):
-            cmd = '%s -m 10 -p %d -u nobody -l 127.0.0.1&' % (MEMCACHED_BIN, 11211 + i)
+            cmd = '%s -m 10 -p %d -u nobody -l 127.0.0.1&' % (MEMCACHED_BIN, 11212 + i)
             self.log.debug(cmd)
             os.system(cmd)
 
@@ -221,11 +221,11 @@ class TestMemcache(unittest.TestCase):
 
 
     def testBasicSingle(self):
-        mc = MemcacheConnection((MEMCACHE_IP, 11211))
+        mc = MemcacheConnection((MEMCACHE_IP, 11212))
         self.sharedTestBasic(mc)
 
     def testSingleBatch(self):
-        mc = MemcacheConnection((MEMCACHE_IP, 11211))
+        mc = MemcacheConnection((MEMCACHE_IP, 11212))
         #batch = mc.batch()
         #batch.set('bset_1', 10)
         #batch.set('bset_2', 20)
@@ -251,7 +251,7 @@ class TestMemcache(unittest.TestCase):
 
     def testExtraSingle(self):
         """test stuff that only makes sense on a single server connection"""
-        mc = MemcacheConnection((MEMCACHE_IP, 11211))
+        mc = MemcacheConnection((MEMCACHE_IP, 11212))
         res1, v1 = mc.version()
         res2, v2 = mc.version()
         self.assertEquals(MemcacheResult.OK, res1)
@@ -264,14 +264,14 @@ class TestMemcache(unittest.TestCase):
     def testBasic(self):
 
         mc = Memcache()
-        mc.set_servers([((MEMCACHE_IP, 11211), 100)])
+        mc.set_servers([((MEMCACHE_IP, 11212), 100)])
 
         self.sharedTestBasic(mc)
 
     def testMemcache(self):
 
         mc = Memcache()
-        mc.set_servers([((MEMCACHE_IP, 11211), 100)])
+        mc.set_servers([((MEMCACHE_IP, 11212), 100)])
 
         N = 10000
 
@@ -283,7 +283,7 @@ class TestMemcache(unittest.TestCase):
     def testTimeout(self):
 
         mc = Memcache()
-        mc.set_servers([((MEMCACHE_IP, 11211), 100)])
+        mc.set_servers([((MEMCACHE_IP, 11212), 100)])
 
         def callback(socket, count, event, args, kwargs):
             print count, event, Tasklet.current()
@@ -293,7 +293,7 @@ class TestMemcache(unittest.TestCase):
                 Tasklet.sleep(1.0)
                 return "OK\r\n"
 
-        unittest.TestSocket.install((MEMCACHE_IP, 11211), callback)
+        unittest.TestSocket.install((MEMCACHE_IP, 11212), callback)
         with Timeout.push(0.5):
             self.assertEquals(MemcacheResult.TIMEOUT, mc.set('blaat', 'aap'))
             print 'done (timeout)'
@@ -303,10 +303,10 @@ class TestMemcache(unittest.TestCase):
     def testMemcacheMultiServer(self):
 
         mc = Memcache()
-        mc.set_servers([((MEMCACHE_IP, 11211), 100),
-                        ((MEMCACHE_IP, 11212), 100),
+        mc.set_servers([((MEMCACHE_IP, 11212), 100),
                         ((MEMCACHE_IP, 11213), 100),
-                        ((MEMCACHE_IP, 11214), 100)])
+                        ((MEMCACHE_IP, 11214), 100),
+                        ((MEMCACHE_IP, 11215), 100)])
 
         N = 10000
         keys = ['test%d' % i for i in range(N)]
@@ -336,10 +336,10 @@ class TestMemcache(unittest.TestCase):
         keys = ['test%d' % i for i in range(N)]
 
         mc = Memcache()
-        mc.set_servers([((MEMCACHE_IP, 11211), 100),
-                        ((MEMCACHE_IP, 11212), 100),
+        mc.set_servers([((MEMCACHE_IP, 11212), 100),
                         ((MEMCACHE_IP, 11213), 100),
-                        ((MEMCACHE_IP, 11214), 100)])
+                        ((MEMCACHE_IP, 11214), 100),
+                        ((MEMCACHE_IP, 11215), 100)])
 
         with unittest.timer() as tmr:
             for i in range(N):
@@ -364,7 +364,7 @@ class TestMemcache(unittest.TestCase):
         from concurrence.io import Socket, BufferedStream
         from concurrence.memcache.protocol import MemcacheProtocol
 
-        socket = Socket.connect((MEMCACHE_IP, 11211))
+        socket = Socket.connect((MEMCACHE_IP, 11212))
         stream = BufferedStream(socket)
         writer = stream.writer
         reader = stream.reader
@@ -448,7 +448,7 @@ class TestMemcache(unittest.TestCase):
 
             connections = []
             def connector():
-                connections.append(cm.get_connection((MEMCACHE_IP, 11211), protocol))
+                connections.append(cm.get_connection((MEMCACHE_IP, 11212), protocol))
 
             Tasklet.new(connector)()
             Tasklet.new(connector)()
