@@ -27,7 +27,7 @@ TEST_EXT = True
 class TestMemcache(unittest.TestCase):
     log = logging.getLogger("TestMemcache")
 
-    def setUp(self):
+    def memcachedRun(self):
         self.log.debug("using memcached daemon: %s", MEMCACHED_BIN)
 
         for i in range(4):
@@ -37,14 +37,29 @@ class TestMemcache(unittest.TestCase):
 
         Tasklet.sleep(1.0) #should be enough for memcached to get up and running
 
-    def tearDown(self):
-        MemcacheConnectionManager.create("default").close_all()
+    def memcachedKill(self):
+        cmd = 'killall -KILL %s' % MEMCACHED_BIN
+        self.log.debug(cmd)
+        os.system(cmd)
+        Tasklet.sleep(1.0) #should be enough for memcached to go down
 
-        cmd = 'killall %s' % MEMCACHED_BIN
+    def memcachedPause(self):
+        cmd = 'killall -STOP %s' % MEMCACHED_BIN
+        self.log.debug(cmd)
+        os.system(cmd)
+        Tasklet.sleep(1.0) #should be enough for memcached to pause
+
+    def memcachedResume(self):
+        cmd = 'killall -CONT %s' % MEMCACHED_BIN
         self.log.debug(cmd)
         os.system(cmd)
 
-        Tasklet.sleep(1.0) #should be enough for memcached to go down
+    def setUp(self):
+        self.memcachedRun()
+
+    def tearDown(self):
+        MemcacheConnectionManager.create("default").close_all()
+        self.memcachedKill()
 
     def testResultCode(self):
 
@@ -285,20 +300,48 @@ class TestMemcache(unittest.TestCase):
         mc = Memcache()
         mc.set_servers([((MEMCACHE_IP, 11212), 100)])
 
-        def callback(socket, count, event, args, kwargs):
-            print count, event, Tasklet.current()
-            if (count, event) == (1, "write"):
-                pass
-            elif (count, event) == (2, "read"):
-                Tasklet.sleep(1.0)
-                return "OK\r\n"
+        self.memcachedPause()
 
-        unittest.TestSocket.install((MEMCACHE_IP, 11212), callback)
+        def clientTimeout():
+            with Timeout.push(0.5):
+                self.assertEquals(MemcacheResult.TIMEOUT, mc.set('blaat', 'aap'))
+        def clientError():
+            with Timeout.push(0.5):
+                self.assertEquals(MemcacheResult.ERROR, mc.set('blaat', 'aap'))
+
+        # Send some requests
+        for i in xrange(0, 1000):
+            Tasklet.new(clientTimeout)()
+        Tasklet.join_children()
         with Timeout.push(0.5):
-            self.assertEquals(MemcacheResult.TIMEOUT, mc.set('blaat', 'aap'))
-            print 'done (timeout)'
+            self.assertEquals(MemcacheResult.TIMEOUT, mc.set('foo', 'bar'))
+        print 'done (timeout)'
 
-        Tasklet.sleep(4.0)
+        self.memcachedResume()
+
+        self.assertEquals(mc.get('blaat'), 'aap')
+        self.assertEquals(mc.get('foo'), 'bar')
+
+        self.memcachedPause()
+
+        # Send some requests
+        for i in xrange(0, 1000):
+            Tasklet.new(clientTimeout)()
+        Tasklet.join_children()
+
+        self.memcachedKill()
+
+        # Send some requests expected
+        for i in xrange(0, 1000):
+            Tasklet.new(clientError)()
+        Tasklet.join_children()
+
+        self.memcachedRun()
+
+        self.assertEquals(MemcacheResult.STORED, mc.set("bar", "baz"))
+        self.assertEquals(None, mc.get("blaat"))
+        self.assertEquals(None, mc.get("foo"))
+        self.assertEquals("baz", mc.get("bar"))
 
     def testMemcacheMultiServer(self):
 

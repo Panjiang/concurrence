@@ -57,6 +57,9 @@ test-test: install
 test-core: install
 	$(PYTHON) test/testcore.py
 
+test-memcache: install
+	$(PYTHON) test/testmemcache.py
+
 coverage:
 	cd test; coverage erase
 	cd test; PYTHON="coverage run -a " make test

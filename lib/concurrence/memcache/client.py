@@ -137,16 +137,28 @@ class MemcacheConnection(object):
         return self._stream is not None
 
     def _defer_commands(self, cmds, result_channel):
+        def _exception(msg):
+            self.log.error(msg)
+            for _, _, error_value in cmds:
+                result_channel.send((MemcacheResult.ERROR, error_value))
+            self.close()
         def _read_results():
             protocol = self._protocol
+            if not self.is_connected():
+                return _exception("lost connection in defer_commands")
             with self._stream.get_reader() as reader:
+                failed = False
                 for cmd, args, error_value in cmds:
                     try:
                         result = protocol.read(cmd, reader)
                         result_channel.send(result)
                     except Exception:
-                        self.log.exception("read error in defer_commands")
+                        self.log.error("read error in defer_commands")
                         result_channel.send((MemcacheResult.ERROR, error_value))
+                        failed = True
+                if failed:
+                    self.close()
+                    return
         #end _read_commands
         def _write_commands():
             protocol = self._protocol
@@ -154,23 +166,18 @@ class MemcacheConnection(object):
                 if not self.is_connected():
                     self.connect()
             except Exception:
-                self.log.exception("connect error in defer_commands")
-                for _, _, error_value in cmds:
-                    result_channel.send((MemcacheResult.ERROR, error_value))
-                return
+                return _exception("connect error in defer_commands")
             with self._stream.get_writer() as writer:
+                failed = False
                 for cmd, args, error_value in cmds:
                     try:
                         protocol.write(cmd, writer, args)
                     except Exception:
-                        self.log.exception("write error in defer_commands")
-                        result_channel.send((MemcacheResult.ERROR, error_value))
+                        return _exception("write error in defer_commands")
                 try:
                     writer.flush()
                 except Exception:
-                    for cmd, args, error_value in cmds:
-                        self.log.exception("write flush error in defer_commands")
-                        result_channel.send((MemcacheResult.ERROR, error_value))
+                    return _exception("write flush error in defer_commands")
             self._read_queue.defer(_read_results)
         #end _write_commands
         self._write_queue.defer(_write_commands)
