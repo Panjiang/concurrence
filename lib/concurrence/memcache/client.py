@@ -171,7 +171,12 @@ class MemcacheConnection(object):
                     except:
                         self.log.exception("write error in defer_commands")
                         result_channel.send((MemcacheResult.ERROR, error_value))
-                writer.flush()
+                try:
+                    writer.flush()
+                except Exception:
+                    for cmd, args, error_value in cmds:
+                        self.log.exception("write flush error in defer_commands")
+                        result_channel.send((MemcacheResult.ERROR, error_value))
             self._read_queue.defer(_read_results)
         #end _write_commands
         self._write_queue.defer(_write_commands)
