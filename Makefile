@@ -43,7 +43,7 @@ dist_clean: clean
 	find . -name .svn -exec rm -rf {} \;
 
 _test: 
-	#cd test; make test
+	cd test; PYTHON=python2.6 make test
 
 test: _test 
 
