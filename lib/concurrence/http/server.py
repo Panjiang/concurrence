@@ -76,7 +76,10 @@ class WSGIInputStream(object):
                     return line
                 return None
             data = self._file.read(min(self._n, 16384))
-            self._n -= len(data)
+            if len(data) == 0:
+                self._n = 0
+            else:
+                self._n -= len(data)
             self.readline_buffer = self.readline_buffer + data
 
     def readlines(self):
