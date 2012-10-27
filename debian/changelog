@@ -1,3 +1,9 @@
+concurrence (0.3.2-21) unstable; urgency=low
+
+  * Correctly handle requests interrupted by client when sending request body
+
+ -- Alexander Lourier <aml@rulezz.ru>  Sun, 28 Oct 2012 01:42:04 +0400
+
 concurrence (0.3.2-20) unstable; urgency=low
 
   * Memcached: survive after connection loss
