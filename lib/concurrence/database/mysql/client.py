@@ -203,8 +203,10 @@ class Connection(object):
             if self.current_resultset:
                 self.current_resultset.close(True)
             self.socket.close()
+            self.socket = None
             self.state = self.STATE_CLOSED
         except Exception:
+            self.socket = None
             self.state = self.STATE_ERROR
             raise
 
@@ -257,7 +259,7 @@ class Connection(object):
 
     def close(self):
         """close this connection"""
-        assert self.is_connected(), "make sure connection is connected before closing"
+        assert self.socket, "make sure socket is opened when calling close"
         if self._incommand != False: assert False, "cannot close while still in a command"
         self._close()
 
@@ -299,6 +301,9 @@ class Connection(object):
 
     def is_connected(self):
         return self.state == self.STATE_CONNECTED
+
+    def is_connecting(self):
+        return self.state == self.STATE_CONNECTING
 
     def query(self, cmd_text):
         """Sends a COM_QUERY command with the given text and return a resultset (select)"""

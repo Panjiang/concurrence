@@ -1,3 +1,9 @@
+concurrence (0.3.2-23) unstable; urgency=low
+
+  * Allow to close MySQL connection in other states
+
+ -- Alexander Lourier <aml@rulezz.ru>  Wed, 26 Jun 2013 13:52:15 +0400
+
 concurrence (0.3.2-22) unstable; urgency=low
 
   * MySQL logging fixed
