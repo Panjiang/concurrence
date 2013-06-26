@@ -1,3 +1,9 @@
+concurrence (0.3.2-22) unstable; urgency=low
+
+  * MySQL logging fixed
+
+ -- Alexander Lourier <aml@rulezz.ru>  Wed, 26 Jun 2013 12:39:49 +0400
+
 concurrence (0.3.2-21) unstable; urgency=low
 
   * Correctly handle requests interrupted by client when sending request body

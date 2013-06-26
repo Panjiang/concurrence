@@ -174,6 +174,7 @@ class Cursor(object):
             raise self._wrap_exception(e, "an error occurred while closing cursor")
         
 class Connection(object):
+    log = logging.getLogger('Connection')
     
     def __init__(self, *args, **kwargs):
 
