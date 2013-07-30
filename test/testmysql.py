@@ -456,6 +456,35 @@ class TestMySQL(unittest.TestCase):
         self.assertEquals(9, p.packet.limit)
         self.assertEquals(9, p.packet.position)
 
+    def testDeadlocks(self):
+        def process(cnn, cur, val):
+            try:
+                cur.execute("begin")
+                cur.execute("insert into tbltest (test_id) values (1)")
+                cur.execute("select sleep(2)")
+                cur.execute("update tbltest set test_id=%d" % val)
+                cur.execute("select sleep(2)")
+                cur.execute("commit")
+                return False
+            except dbapi.Error as e:
+                return "deadlock" in str(e).lower()
+        cnn1 = dbapi.connect(host = DB_HOST, user = DB_USER, passwd = DB_PASSWD, db = DB_DB)
+        cur1 = cnn1.cursor()
+        cnn2 = dbapi.connect(host = DB_HOST, user = DB_USER, passwd = DB_PASSWD, db = DB_DB)
+        cur2 = cnn2.cursor()
+        t1 = Tasklet.new(process)(cnn1, cur1, 2)
+        t2 = Tasklet.new(process)(cnn2, cur2, 3)
+        res = Tasklet.join_all([t1, t2])
+        self.assertTrue(res[0] or res[1],
+                'At least one of the queries expected to fail due to deadlock (innodb must be used)')
+        # Both connections must survive after error
+        cur1.execute("select 1")
+        cur2.execute("select 2")
+        cur1.close()
+        cnn1.close()
+        cur2.close()
+        cnn2.close()
+
 if __name__ == '__main__':
     unittest.main(timeout = 60)
 
