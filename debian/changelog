@@ -1,3 +1,10 @@
+concurrence (0.3.2-24) unstable; urgency=low
+
+  * MySQL: less verbose logging
+  * MySQL: keep connection after ClientCommandError
+
+ -- Alexander Lourier <aml@rulezz.ru>  Tue, 30 Jul 2013 17:22:26 +0400
+
 concurrence (0.3.2-23) unstable; urgency=low
 
   * Allow to close MySQL connection in other states
