@@ -89,7 +89,6 @@ class Cursor(object):
         return ''.join(escaped)
             
     def _wrap_exception(self, e, msg):
-        self.log.exception(msg)
         if isinstance(e, ConcurrenceTimeoutError):
             return TimeoutError(msg + ': ' + str(e))
         else:
@@ -216,7 +215,6 @@ class Connection(object):
             raise
         except Exception, e:
             msg = "an error occurred while closing connection: "
-            self.log.exception(msg)
             raise Error(msg + str(e))
             
     def cursor(self):
