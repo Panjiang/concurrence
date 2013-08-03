@@ -288,6 +288,14 @@ class Tasklet(stackless.tasklet):
             parent = self.parent()
             if parent:
                 parent._remove_child(self)
+            children = self.children()
+            if children:
+                for child in children:
+                    if parent:
+                        child._set_parent(parent)
+                        parent._add_child(child)
+                    else:
+                        child._set_parent(None)
             self._parent = None
             self._children = None
             self._join_channel = None
@@ -316,7 +324,10 @@ class Tasklet(stackless.tasklet):
 
     #TODO parent() and children() should be properties
     def _set_parent(self, parent):
-        self._parent = weakref.ref(parent)
+        if parent:
+            self._parent = weakref.ref(parent)
+        else:
+            self._parent = None
 
     def parent(self):
         """Gets the parent of this Tasklet. This method may return None if the parent is no longer there."""
