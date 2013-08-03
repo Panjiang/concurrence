@@ -543,13 +543,13 @@ class Tasklet(stackless.tasklet):
             t.__exec__(f, *args, **kwargs)
 
         t.bind(w)
-        if not daemon:
-            parent = cls.current()
-            #stackless main task is not an instance of our Tasklet class (but of stackless.tasklet)
-            #so we can only keep parent/child relation for Tasklet instances
-            if isinstance(parent, cls):
-                t._set_parent(parent)
-                parent._add_child(t)
+
+        parent = cls.current()
+        #stackless main task is not an instance of our Tasklet class (but of stackless.tasklet)
+        #so we can only keep parent/child relation for Tasklet instances
+        if isinstance(parent, cls):
+            t._set_parent(parent)
+            parent._add_child(t)
 
         return t
 
