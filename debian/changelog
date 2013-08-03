@@ -1,3 +1,15 @@
+concurrence (0.3.2-26) unstable; urgency=low
+
+  * Children of destroyed parents are adopted by grandparents
+
+ -- Alexander Lourier <aml@rulezz.ru>  Sat, 03 Aug 2013 23:11:44 +0400
+
+concurrence (0.3.2-25) unstable; urgency=low
+
+  * Daemons are not excluded from tasklets hierarchy
+
+ -- Alexander Lourier <aml@rulezz.ru>  Sat, 03 Aug 2013 21:52:44 +0400
+
 concurrence (0.3.2-24) unstable; urgency=low
 
   * MySQL: less verbose logging
