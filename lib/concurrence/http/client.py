@@ -8,12 +8,17 @@
 from __future__ import with_statement
 
 import time
+import ssl
 import logging
+import httplib
 
 from concurrence import Tasklet, Channel, Message, __version__, TimeoutError
 from concurrence.timer import Timeout
 from concurrence.io import Connector, BufferedStream
 from concurrence.http import HTTPError, HTTPRequest, HTTPResponse
+from socket import _socketobject
+from concurrence.io.socket import Socket
+from _ssl import SSLError
 
 AGENT = 'Concurrence-Http-Client/' + __version__
 
@@ -160,7 +165,7 @@ class HTTPConnection(object):
         request.path = path
         request.host = host or self._host
         if body is not None:
-           request.body = body
+            request.body = body
         return request
 
     def perform(self, request):
@@ -185,9 +190,44 @@ class HTTPConnection(object):
                 writer.write_bytes("%s: %s\r\n" % (header_name, header_value))
             writer.write_bytes("\r\n")
             if request.body is not None:
-               writer.write_bytes(request.body)
+                writer.write_bytes(request.body)
             writer.flush()
 
     def close(self):
         """Close this connection."""
         self._stream.close()
+
+
+HTTPS_CONNECTION_TIMEOUT = 15
+sleep_time_dict = {1:0.1, 2:0.2, 3:0.7, 4:2.0}
+
+class HTTPSConnection(httplib.HTTPSConnection):
+    def connect(self, timeout=HTTPS_CONNECTION_TIMEOUT):
+        "Connect to a host on a given (SSL) port."
+        sock = Socket.connect((self.host, self.port), timeout=timeout)
+        sock.socket.setblocking(1)
+        _sock = _socketobject(_sock=sock.socket)
+        
+        if self._tunnel_host:
+            self.sock = sock
+            self._tunnel()
+        self.sock = ssl.wrap_socket(_sock, self.key_file, self.cert_file)
+        self.sock.setblocking(0)
+
+def try_getresponse(cnn, times=1, sleep_time_dict=sleep_time_dict):
+    """
+    async https request need read response multiple times until timeout.
+    """
+    # must sleep, or throw exception:
+    # _ssl.c:1354: The operation did not complete
+    try:
+        response = cnn.getresponse()
+    except SSLError:
+        sleep_time = sleep_time_dict.get(times, None)
+        if sleep_time is None:
+            assert False, 'request timeout'
+        Tasklet.sleep(sleep_time)
+        response = try_getresponse(cnn, times=times + 1)
+    except:
+        raise
+    return response

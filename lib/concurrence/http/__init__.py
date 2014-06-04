@@ -73,4 +73,4 @@ class HTTPResponse(object):
         return iter(self.iter)
 
 from concurrence.http.server import WSGIServer
-from concurrence.http.client import HTTPConnection
+from concurrence.http.client import HTTPConnection, HTTPSConnection, try_getresponse 

@@ -17,6 +17,7 @@ from concurrence.io import IOStream
 
 DEFAULT_BACKLOG = 512
 XMOD = 8
+TIMEOUT_CURRENT = 2
 
 _interceptor = None
 
