@@ -1,3 +1,6 @@
+0.3.3
+- added support for ASYNC GET with HTTPS
+
 0.3.2
 - added support for POST to HTTP Client
 - removed profile function, added profile cmdline argument
